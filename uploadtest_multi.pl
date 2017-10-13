@@ -25,8 +25,7 @@ foreach my $qs_pair (@qs_pairs) {
 undef @qs_pairs;
 delete $qs{pid};
 
-#my $save_to_directory = qq~/home2/jmelpubs/public_html/programming_demo/upload_test~;
-my $save_to_directory = qq~/home2/jmelpubs/uploaddemo~;
+my $save_to_directory = qq~/home/normywebguy/uploaddemo~;
 my $ScriptURL = qq~https://$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}~;
 
 my $results;
