@@ -40,12 +40,19 @@ if($qs{upload} == 1) {
     # calls
     #
     #The argumens are:
-    #upload('path to save to', 'upload file name', 'new file name', 'max size in kb', 'boolean: serialize same name uploads'); 
+    #upload('path to save to', 'name of form field on upload page', 'new file name', 'max size in kb', 'boolean: serialize same name uploads'); 
     my $q = CGI->new;
-    my $res1 = &upload($save_to_directory, $q->param('myfield'), '', 100, 1);
-    my $res2 = &upload($save_to_directory, $q->param('anotherfile'), '', 100, 1);
-    my $res3 = &upload($save_to_directory, $q->param('FILE3'), '', 100, 1);
-    $results = "Upload 1: $res1<br />Upload 2: $res2<br />Upload 3: $res3<br /><br />";
+    my @fields;
+    
+    if($q->param('myfield') =~ /\,/) {
+        @fields = split(/\,/, $q->param('myfield'));
+    } else {
+        push(@fields, $q->param('myfield'));
+    }
+    foreach $file (@fields) {
+        my $res = &upload($save_to_directory, $file, '', 100, 1);
+        $results .= "Upload for $file : $res<br /><br />";
+    }
 }
 
 if( ($qs{delete} eq '1') && $qs{f}) {
@@ -94,7 +101,7 @@ print qq~
         <!--
             This is the actual upload form.
             Note that you can name the upload
-            fields anything you want so long
+            field anything you want so long
             as you pass that field name to the
             upload() subroutine. (see above)
         -->
@@ -108,14 +115,9 @@ print qq~
         
     <form method="post" action="$ScriptURL?upload=1&pid=$$" enctype="multipart/form-data">
 
-    File 1: <input type="file" name="myfield">
+    File: <input type="file" name="myfield" multiple>
     <br /><br />
 
-    File 2: <input type="file" name="anotherfile">
-    <br /><br />
-
-    File 3: <input type="file" name="FILE3">
-    <br /><br />
 
     <input type="submit" value="Upload" class="admin-button-normal" />
     </form>
