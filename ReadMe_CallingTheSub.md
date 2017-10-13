@@ -15,3 +15,18 @@ If you have more than one file upload field on your page, then call each one suc
     my $res3 = &upload($save_to_directory, $q->param('myfield3'), '', 100, 1);
 </pre>
 
+If you are using the <code>multiple</code> attribute, then this is the correct way to call the subroutine:
+<pre>
+    my $q = CGI->new;
+    my @fields;
+    if($q->param('myfield') =~ /\,/) {
+        @fields = split(/\,/, $q->param('myfield'));
+    } else {
+        push(@fields, $q->param('myfield'));
+    }
+    foreach $file (@fields) {
+        my $res = &upload($save_to_directory, $file, '', 100, 1);
+        $results .= "Upload for $file : $res<br /><br />";
+    }
+</pre>
+
