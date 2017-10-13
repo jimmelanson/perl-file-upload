@@ -9,7 +9,7 @@ sub upload {
     my $file = shift;
     my $newname = shift;
     my $maxsize_in_kb = shift;
-    my $auto_rename = shift;
+    my $serialize = shift;
     my @good_extensions = ('gif', 'jpg', 'jpeg', 'png', 'txt', 'pdf');
     #	If you want to limit the types of extension that can be uploaded, specify them
     #	here by adding them to the array. For example, if you wanted to permit only
@@ -41,7 +41,7 @@ sub upload {
             unless($good_extension_found) {
                 return("The subroutine will not accept the file extension $ext");
             }
-            if((-e "$path/$filename") && ($auto_rename == 1)) {
+            if((-e "$path/$filename") && ($serialize == 1)) {
                 my $pick_new_name = 1;
                 my $fore_num = 1;
                 while($pick_new_name) {
