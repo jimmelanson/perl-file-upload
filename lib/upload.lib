@@ -1,0 +1,89 @@
+
+#	Requirements:		UNIX Server, Perl5+, CGI.pm OR HTML::Form
+#	Created:		September 22nd, 2000
+#	Author: 		Jim Melanson
+
+
+sub upload {
+    my $path = shift;
+    my $file = shift;
+    my $newname = shift;
+    my $maxsize_in_kb = shift;
+    my $auto_rename = shift;
+    my @good_extensions = ('gif', 'jpg', 'jpeg', 'png', 'txt', 'pdf');
+    #	If you want to limit the types of extension that can be uploaded, specify them
+    #	here by adding them to the array. For example, if you wanted to permit only
+    #	the upload of gif's, jpg's and png's, then you would set the above array to
+    #	look like this:
+    #	@good_extensions = ('gif', 'jpg', 'jpeg', 'png', 'txt', 'pdf');
+    #
+    if($path) {
+        if($file) {
+            my $filename = $file; 
+            #Strip the user's file path and keep the file name.
+            $filename =~ s/^.*(\\|\/)//;
+            $filename =~ s/ +/\_/g;
+            $filename =~ s/\"//g; #"
+            $filename = $newname if $newname;
+            $filename =~ /^(.+)\.([^\.]+)$/;
+            $filename = $ENV{REMOTE_ADDR} . '_' . $filename;
+            my $docname = $ENV{REMOTE_ADDR} . '_' . $1;
+            my $ext = $2;
+            my $good_extension_found = 1;
+            if(@good_extensions) {
+                $good_extension_found = 0;
+                foreach my $goodext (@good_extensions) {
+                    if(uc($goodext) eq uc($ext)) {
+                        $good_extension_found = 1;
+                        last;
+                    }
+                }
+            }
+            unless($good_extension_found) {
+                return("The subroutine will not accept the file extension $ext");
+            }
+            if((-e "$path/$filename") && ($auto_rename == 1)) {
+                my $pick_new_name = 1;
+                my $fore_num = 1;
+                while($pick_new_name) {
+                    my $test_name = $docname . '(' . $fore_num . ')' . '.' . $ext;
+                    unless(-e "$path/$test_name") {
+                        $pick_new_name = 0;
+                        $filename = $test_name;
+                    }
+                    $fore_num++;
+                }
+            }
+            if(open(OUTFILE, ">$path/$filename")) {
+                #If you are on windows you'll need this for binary files. If you are on UNIX it's ignored.
+                binmode($file);
+                my $total_bytes = 0;
+                while (my $bytesread = read($file, my $buffer, 1024)) { 
+                    print OUTFILE $buffer; 
+                    $total_bytes += $bytesread
+                } 
+                close (OUTFILE);
+                if($maxsize_in_kb > 0) {
+                    if($total_bytes > ($maxsize_in_kb * 1024)) {
+                        unlink("$path/$filename");
+                        return("The uploaded file $filename was too big and has been removed.");
+                    } else {
+                        return(1);
+                    }
+                } else {
+                    return(1);
+                }
+            } else {
+                return("The subroutine could not open the destination file: $filename");
+            }
+        } else {
+            return("The upload form was submitted without a file being uploaded.");
+        }
+    } else {
+        return("The subroutine was not told the absolute path to the directory where the uploaded file should be stored.");
+    }
+}
+
+1;
+
+
