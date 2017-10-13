@@ -1,12 +1,5 @@
 #!/usr/bin/perl
 
-#BEGIN {
-#    $| = 1;
-#    open(STDERR, ">&STDOUT");
-#    print "Content-type: text/html\n\n<pre>\n";
-#}
-
-
 #	Requirements:		UNIX Server, Perl5+, CGI.pm
 #	Created:		September 22nd, 2000
 #	Author: 		Jim Melanson
