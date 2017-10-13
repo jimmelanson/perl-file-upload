@@ -26,8 +26,7 @@ sub upload {
             $filename =~ s/\"//g; #"
             $filename = $newname if $newname;
             $filename =~ /^(.+)\.([^\.]+)$/;
-            $filename = $ENV{REMOTE_ADDR} . '_' . $filename;
-            my $docname = $ENV{REMOTE_ADDR} . '_' . $1;
+            my $docname = $1;
             my $ext = $2;
             my $good_extension_found = 1;
             if(@good_extensions) {
